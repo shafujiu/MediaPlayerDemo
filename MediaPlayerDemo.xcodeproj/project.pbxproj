@@ -8,22 +8,24 @@
 
 /* Begin PBXBuildFile section */
 		818FB889269C1E2E00FA5B84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB888269C1E2E00FA5B84 /* AppDelegate.swift */; };
-		818FB88B269C1E2E00FA5B84 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB88A269C1E2E00FA5B84 /* SceneDelegate.swift */; };
 		818FB88D269C1E2E00FA5B84 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB88C269C1E2E00FA5B84 /* ViewController.swift */; };
 		818FB890269C1E2E00FA5B84 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818FB88E269C1E2E00FA5B84 /* Main.storyboard */; };
 		818FB892269C1E2F00FA5B84 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 818FB891269C1E2F00FA5B84 /* Assets.xcassets */; };
 		818FB895269C1E2F00FA5B84 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818FB893269C1E2F00FA5B84 /* LaunchScreen.storyboard */; };
+		818FB89D269C1FBC00FA5B84 /* MediaPlayerProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB89C269C1FBC00FA5B84 /* MediaPlayerProtocol.swift */; };
+		818FB89F269C4F6300FA5B84 /* MediaPlayerViewProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB89E269C4F6300FA5B84 /* MediaPlayerViewProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		818FB885269C1E2E00FA5B84 /* MediaPlayerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaPlayerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		818FB888269C1E2E00FA5B84 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		818FB88A269C1E2E00FA5B84 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		818FB88C269C1E2E00FA5B84 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		818FB88F269C1E2E00FA5B84 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		818FB891269C1E2F00FA5B84 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		818FB894269C1E2F00FA5B84 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		818FB896269C1E2F00FA5B84 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		818FB89C269C1FBC00FA5B84 /* MediaPlayerProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerProtocol.swift; sourceTree = "<group>"; };
+		818FB89E269C4F6300FA5B84 /* MediaPlayerViewProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerViewProtocol.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,12 +59,13 @@
 			isa = PBXGroup;
 			children = (
 				818FB888269C1E2E00FA5B84 /* AppDelegate.swift */,
-				818FB88A269C1E2E00FA5B84 /* SceneDelegate.swift */,
 				818FB88C269C1E2E00FA5B84 /* ViewController.swift */,
 				818FB88E269C1E2E00FA5B84 /* Main.storyboard */,
 				818FB891269C1E2F00FA5B84 /* Assets.xcassets */,
 				818FB893269C1E2F00FA5B84 /* LaunchScreen.storyboard */,
 				818FB896269C1E2F00FA5B84 /* Info.plist */,
+				818FB89C269C1FBC00FA5B84 /* MediaPlayerProtocol.swift */,
+				818FB89E269C4F6300FA5B84 /* MediaPlayerViewProtocol.swift */,
 			);
 			path = MediaPlayerDemo;
 			sourceTree = "<group>";
@@ -139,7 +142,8 @@
 			files = (
 				818FB88D269C1E2E00FA5B84 /* ViewController.swift in Sources */,
 				818FB889269C1E2E00FA5B84 /* AppDelegate.swift in Sources */,
-				818FB88B269C1E2E00FA5B84 /* SceneDelegate.swift in Sources */,
+				818FB89F269C4F6300FA5B84 /* MediaPlayerViewProtocol.swift in Sources */,
+				818FB89D269C1FBC00FA5B84 /* MediaPlayerProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

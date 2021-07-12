@@ -19,7 +19,6 @@ class ViewController: UIViewController {
         player.playView?.frame = playView.bounds
         playView.addSubview(player.playView!)
         player.play()
-        
     }
 
 

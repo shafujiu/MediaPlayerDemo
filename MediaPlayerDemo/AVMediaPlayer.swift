@@ -69,8 +69,6 @@ struct MediaSeekingInfo {
 
 class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     
-    
-    
     private var _avPlayer: AVPlayer!
     private var _playView: AVMediaPlayerLayerView?
     private var refreshTimer: Timer?
@@ -108,6 +106,7 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     var playView: UIView? {
         _playView
     }
+    
     private(set) var timeControlStatus: PlaybackTimeControlStatus {
         didSet {
             self._refreshOrStop()
@@ -125,7 +124,13 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     
     private(set) var isPlayed: Bool = false
     
-    private(set) var isPlaybackFinished: Bool
+    private(set) var isPlaybackFinished: Bool {
+        didSet {
+            if isPlaybackFinished {
+                self._postNotification(.SJMediaPlayerPlaybackDidFinishNotification)
+            }
+        }
+    }
     var volume: Float {
         set {
             _avPlayer.volume = newValue

@@ -25,23 +25,35 @@ enum PlaybackTimeControlStatus {
 }
 
 extension Notification.Name {
-    static let SJMediaPlayerViewReadyForDisplayNotification = Notification.Name("SJMediaPlayerViewReadyForDisplayNotification")
-    
-    static let SJMediaPlayerDidReplayNotification = Notification.Name("SJMediaPlayerDidReplayNotification")
-    
-    static let SJMediaPlayerTimeControlStatusDidChangeNotification = Notification.Name("SJMediaPlayerTimeControlStatusDidChangeNotification")
-    
-    static let SJMediaPlayerDurationDidChangeNotification = Notification.Name("SJMediaPlayerDurationDidChangeNotification")
-    
-    static let SJMediaPlayerPlayableDurationDidChangeNotification = Notification.Name("SJMediaPlayerPlayableDurationDidChangeNotification")
-    
     static let SJMediaPlayerAssetStatusDidChangeNotification = Notification.Name("SJMediaPlayerAssetStatusDidChangeNotification")
-    
+    static let SJMediaPlayerTimeControlStatusDidChangeNotification = Notification.Name("SJMediaPlayerTimeControlStatusDidChangeNotification")
     static let SJMediaPlayerPresentationSizeDidChangeNotification = Notification.Name("SJMediaPlayerPresentationSizeDidChangeNotification")
+    static let SJMediaPlayerPlaybackDidFinishNotification = Notification.Name("SJMediaPlayerPlaybackDidFinishNotification")
+    static let SJMediaPlayerDidReplayNotification = Notification.Name("SJMediaPlayerDidReplayNotification")
+    static let SJMediaPlayerDurationDidChangeNotification = Notification.Name("SJMediaPlayerDurationDidChangeNotification")
+    static let SJMediaPlayerPlayableDurationDidChangeNotification = Notification.Name("SJMediaPlayerPlayableDurationDidChangeNotification")
+    static let SJMediaPlayerViewReadyForDisplayNotification = Notification.Name("SJMediaPlayerViewReadyForDisplayNotification")
 }
 
 protocol MediaPlayerDelegate: AnyObject {
+    /// 资源状态改变回调
+    func mediaPlayer(_ player: MediaPlayerProtocol, assetStatusDidChange status: AssetStatus)
+    /// 时间控制状态
+    func mediaPlayer(_ player: MediaPlayerProtocol, timeControlStatusDidChange status: PlaybackTimeControlStatus)
+    /// 显示的视图的大小
+    func mediaPlayer(_ player: MediaPlayerProtocol, presentationSizeDidChange size: CGSize)
+    /// 播放完成
+    func mediaPlayerPlaybackDidFinish(_ player: MediaPlayerProtocol)
+    /// 总时长变化
+    func mediaPlayer(_ player: MediaPlayerProtocol, durationDidChange duration: TimeInterval)
+    /// 预加载时长变化
+    func mediaPlayer(_ player: MediaPlayerProtocol, playableDurationDidChange duration: TimeInterval)
+    /// 可以渲染View
+    func mediaPlayerReadyForDisplay(_ player: MediaPlayerProtocol)
+    /// 进度回调
+    func mediaPlayer(_ player: MediaPlayerProtocol, currentTimeDidChange time: TimeInterval)
     
+    func mediaPlayer(_ player: MediaPlayerProtocol, willSeekTo time: CMTime)
 }
 
 protocol MediaPlayerProtocol: AnyObject {

@@ -76,6 +76,8 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     private var minBufferedDuration: TimeInterval?
     private var innerError: Error?
     private var seekingInfo: MediaSeekingInfo = MediaSeekingInfo(isSeeking: false, time: .zero)
+//    private var playerItemStatusOb: NSKeyValueObservation?
+    
     
     weak var deleagte: MediaPlayerDelegate?
     
@@ -335,6 +337,14 @@ private extension AVMediaPlayer {
             guard let self = self else {return}
             self._updateDuration()
         })
+//        playerItemStatusOb = playItem?.observe(\AVPlayerItem.status, options: [.new], changeHandler: { [weak self] _, change in
+//            change.newValue
+//
+//            self?._toEvaluating()
+//        })
+        
+        
+        
         
         // 监听playItem 状态
         playItem?.addObserver(self, forKeyPath: kStatus, options: [.new], context: &kStatus)

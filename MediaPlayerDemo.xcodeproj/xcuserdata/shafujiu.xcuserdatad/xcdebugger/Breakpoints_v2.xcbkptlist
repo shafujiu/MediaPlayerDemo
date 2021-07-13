@@ -7,32 +7,112 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "BC7CDEAD-E7A9-4B5C-8DA8-4747CB22E80D"
+            uuid = "29A26BE2-F691-442A-9B0E-D21BB89FFE6D"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MediaPlayerDemo/MediaPlayerProtocol.swift"
+            filePath = "MediaPlayerDemo/AVMediaPlayer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "298"
-            endingLineNumber = "298"
-            landmarkName = "_updateDuration()"
+            startingLineNumber = "284"
+            endingLineNumber = "284"
+            landmarkName = "observeValue(forKeyPath:of:change:context:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "1B39B18B-EA96-4EC8-9495-485AE42EE3EE"
+            uuid = "A608B6FA-3D8F-4D7B-AB95-0660E2D5648B"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MediaPlayerDemo/MediaPlayerProtocol.swift"
+            filePath = "MediaPlayerDemo/AVMediaPlayer.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "291"
-            endingLineNumber = "291"
-            landmarkName = "_prepareToPlay()"
+            startingLineNumber = "254"
+            endingLineNumber = "254"
+            landmarkName = "observeValue(forKeyPath:of:change:context:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "9FF1438F-F532-4CCE-A723-1B7023E1A3C2"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MediaPlayerDemo/AVMediaPlayer.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "255"
+            endingLineNumber = "255"
+            landmarkName = "observeValue(forKeyPath:of:change:context:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2234C8BC-D87F-495C-BC3A-01A6DE70CB4B"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MediaPlayerDemo/AVMediaPlayer.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "268"
+            endingLineNumber = "268"
+            landmarkName = "observeValue(forKeyPath:of:change:context:)"
+            landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "2234C8BC-D87F-495C-BC3A-01A6DE70CB4B - 5d05b2cbe134119c"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "MediaPlayerDemo.kStatus.unsafeMutableAddressor : Swift.String"
+                  moduleName = "MediaPlayerDemo"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/shafujiu/Documents/MyGithubCode/MediaPlayerDemo/MediaPlayerDemo/AVMediaPlayer.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "268"
+                  endingLineNumber = "268"
+                  offsetFromSymbolStart = "8">
+               </Location>
+               <Location
+                  uuid = "2234C8BC-D87F-495C-BC3A-01A6DE70CB4B - 4cec7c03a84744ab"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "one-time initialization function for kStatus"
+                  moduleName = "MediaPlayerDemo"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/shafujiu/Documents/MyGithubCode/MediaPlayerDemo/MediaPlayerDemo/AVMediaPlayer.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "268"
+                  endingLineNumber = "268"
+                  offsetFromSymbolStart = "44">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "346D6119-6CFA-4527-9F2C-FC94A5A54D58"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MediaPlayerDemo/AVMediaPlayer.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "313"
+            endingLineNumber = "313"
+            landmarkName = "_addPeriodicTimeObserver()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

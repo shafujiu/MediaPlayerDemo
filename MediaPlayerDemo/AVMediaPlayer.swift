@@ -114,6 +114,8 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
         
         isPlaybackFinished = false
         timeControlStatus = .paused
+        duration = 0
+        playableDuration = 0
         
         super.init()
         let layerView = AVMediaPlayerLayerView()
@@ -137,7 +139,7 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     func seekToTime(_ time: TimeInterval, completionHandler: CompletionHandler?) {
         let tolerance = CMTime.positiveInfinity
         var targetTime = time
-        let dur = duration ?? 0
+        let dur = duration
         if time > dur {
             targetTime = dur * 0.98
         } else if time < 0 {
@@ -149,25 +151,25 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     
     var currentTime: TimeInterval {
         if isPlaybackFinished {
-            return duration ?? 0
+            return duration 
         } else {
             return CMTimeGetSeconds(_avPlayer.currentTime())
         }
     }
     
-    private(set) var duration: TimeInterval? {
+    private(set) var duration: TimeInterval {
         didSet {
             self._postNotification(.SJMediaPlayerDurationDidChangeNotification)
-            guard let dur = duration else {return}
-            self.delegate?.mediaPlayer(self, durationDidChange: dur)
+//            guard let dur = duration else {return}
+            self.delegate?.mediaPlayer(self, durationDidChange: duration)
         }
     }
     
-    private(set) var playableDuration: TimeInterval? {
+    private(set) var playableDuration: TimeInterval {
         didSet {
             self._postNotification(.SJMediaPlayerPlayableDurationDidChangeNotification)
-            guard let ableDur = playableDuration else {return}
-            self.delegate?.mediaPlayer(self, playableDurationDidChange: ableDur)
+//            guard let ableDur = playableDuration else {return}
+            self.delegate?.mediaPlayer(self, playableDurationDidChange: playableDuration)
         }
     }
     

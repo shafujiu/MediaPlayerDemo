@@ -96,8 +96,8 @@ protocol MediaPlayerProtocol: AnyObject {
     func seekToTime(_ time: TimeInterval, completionHandler: CompletionHandler?)
     
     var currentTime: TimeInterval { get }
-    var duration: TimeInterval? { get }
-    var playableDuration: TimeInterval? { get }
+    var duration: TimeInterval { get }
+    var playableDuration: TimeInterval { get }
     
     func play()
     func pause()

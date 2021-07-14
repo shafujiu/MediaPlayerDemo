@@ -15,7 +15,7 @@ enum AssetStatus {
     case failed
 }
 
-enum PlaybackTimeControlStatus {
+enum MediaTimeControlStatus {
     /// 暂停状态(已调用暂停或未执行任何操作的状态)
     case paused
     /// 播放状态(已调用播放), 当前正在缓冲或正在评估能否播放. 可以通过`reasonForWaitingToPlay`来获取原因, UI层可以根据原因来控制loading视图的状态.
@@ -39,7 +39,7 @@ protocol MediaPlayerDelegate: AnyObject {
     /// 资源状态改变回调
     func mediaPlayer(_ player: MediaPlayerProtocol, assetStatusDidChange status: AssetStatus)
     /// 时间控制状态
-    func mediaPlayer(_ player: MediaPlayerProtocol, timeControlStatusDidChange status: PlaybackTimeControlStatus)
+    func mediaPlayer(_ player: MediaPlayerProtocol, timeControlStatusDidChange status: MediaTimeControlStatus)
     /// 显示的视图的大小
     func mediaPlayer(_ player: MediaPlayerProtocol, presentationSizeDidChange size: CGSize)
     /// 播放完成
@@ -48,12 +48,10 @@ protocol MediaPlayerDelegate: AnyObject {
     func mediaPlayer(_ player: MediaPlayerProtocol, durationDidChange duration: TimeInterval)
     /// 预加载时长变化
     func mediaPlayer(_ player: MediaPlayerProtocol, playableDurationDidChange duration: TimeInterval)
-    /// 可以渲染View
+    /// playView can display
     func mediaPlayerReadyForDisplay(_ player: MediaPlayerProtocol)
     /// 进度回调
     func mediaPlayer(_ player: MediaPlayerProtocol, currentTimeDidChange time: TimeInterval)
-    
-    func mediaPlayer(_ player: MediaPlayerProtocol, willSeekTo time: CMTime)
 }
 
 protocol MediaPlayerProtocol: AnyObject {
@@ -64,24 +62,24 @@ protocol MediaPlayerProtocol: AnyObject {
     var periodicTimeInterval: TimeInterval { get set }
     
     /// 播放器相关的回调
-    var deleagte: MediaPlayerDelegate? { get set }
+    var delegate: MediaPlayerDelegate? { get set }
     
     var presentationSize: CGSize? { get }
     
     var playView: UIView? { get }
     
-    var timeControlStatus: PlaybackTimeControlStatus { get }
+    var timeControlStatus: MediaTimeControlStatus { get }
     
     var assetStatus: AssetStatus { get }
     
     /// 播放失败的时候  返回
     var error: Error? { get }
     
-    /// 是否调用过`replay`
-    var isReplayed: Bool { get }
-    
-    /// 是否调用过`play`方法
-    var isPlayed: Bool { get }
+//    /// 是否调用过`replay`
+//    var isReplayed: Bool { get }
+//
+//    /// 是否调用过`play`方法
+//    var isPlayed: Bool { get }
     
     /// 播放结束
     var isPlaybackFinished: Bool { get }
@@ -95,7 +93,7 @@ protocol MediaPlayerProtocol: AnyObject {
     /// - Parameters:
     ///   - time: time description
     ///   - completionHandler: 选中 回调
-    func seekToTime(_ time: CMTime, completionHandler: CompletionHandler?)
+    func seekToTime(_ time: TimeInterval, completionHandler: CompletionHandler?)
     
     var currentTime: TimeInterval { get }
     var duration: TimeInterval? { get }
@@ -111,4 +109,5 @@ protocol MediaPlayerViewProtocol {
 
     var videoGravity: AVLayerVideoGravity { get set }
     var readyForDisplay: Bool { get }
+    var readyForDisplayHandler: (()->())? { get set }
 }

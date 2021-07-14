@@ -18,29 +18,91 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zQ3-Ia-lPL">
-                                <rect key="frame" x="50" y="219" width="326" height="195"/>
-                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <rect key="frame" x="20" y="219" width="374" height="195"/>
+                                <color key="backgroundColor" systemColor="systemGray6Color"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="195" id="v3R-ni-joC"/>
                                 </constraints>
                             </view>
+                            <stackView opaque="NO" contentMode="scaleToFill" distribution="fillEqually" spacing="35" translatesAutoresizingMaskIntoConstraints="NO" id="cOJ-cB-8F9">
+                                <rect key="frame" x="20" y="460" width="374" height="50"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="pnC-Vx-11h">
+                                        <rect key="frame" x="0.0" y="0.0" width="101.5" height="50"/>
+                                        <state key="normal" title="play"/>
+                                        <connections>
+                                            <action selector="play:" destination="BYZ-38-t0r" eventType="touchUpInside" id="XWo-DX-6M9"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WOw-D0-1A5">
+                                        <rect key="frame" x="136.5" y="0.0" width="101" height="50"/>
+                                        <state key="normal" title="pause"/>
+                                        <connections>
+                                            <action selector="pause:" destination="BYZ-38-t0r" eventType="touchUpInside" id="ExA-5P-4Gt"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="H8O-hb-muV">
+                                        <rect key="frame" x="272.5" y="0.0" width="101.5" height="50"/>
+                                        <state key="normal" title="replay"/>
+                                        <connections>
+                                            <action selector="replay:" destination="BYZ-38-t0r" eventType="touchUpInside" id="1Ub-Iq-X3J"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="50" id="9pb-7g-Mey"/>
+                                </constraints>
+                            </stackView>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="Huk-PT-yOF">
+                                <rect key="frame" x="18" y="530" width="378" height="31"/>
+                                <connections>
+                                    <action selector="progressSliderValueChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="ouk-Ic-uQa"/>
+                                </connections>
+                            </slider>
+                            <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="E2V-Z4-gwv">
+                                <rect key="frame" x="18" y="601" width="157" height="31"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="153" id="qzH-7f-7Mi"/>
+                                </constraints>
+                                <connections>
+                                    <action selector="volumeSliderChange:" destination="BYZ-38-t0r" eventType="valueChanged" id="MOa-1J-b9r"/>
+                                </connections>
+                            </slider>
+                            <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="L1R-cw-zaX">
+                                <rect key="frame" x="20" y="681" width="51" height="31"/>
+                                <connections>
+                                    <action selector="muteSwitch:" destination="BYZ-38-t0r" eventType="valueChanged" id="xyN-9c-3yD"/>
+                                </connections>
+                            </switch>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
+                            <constraint firstItem="Huk-PT-yOF" firstAttribute="top" secondItem="cOJ-cB-8F9" secondAttribute="bottom" constant="20" id="2s0-l9-0Ag"/>
+                            <constraint firstItem="cOJ-cB-8F9" firstAttribute="top" secondItem="zQ3-Ia-lPL" secondAttribute="bottom" constant="46" id="6cc-I1-iqz"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="cOJ-cB-8F9" secondAttribute="trailing" constant="20" id="9ju-4l-TAs"/>
+                            <constraint firstItem="E2V-Z4-gwv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="CSi-B1-ZOR"/>
+                            <constraint firstItem="Huk-PT-yOF" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="Hca-jk-YFB"/>
+                            <constraint firstItem="E2V-Z4-gwv" firstAttribute="top" secondItem="Huk-PT-yOF" secondAttribute="bottom" constant="41" id="J4O-Fa-fpN"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="Huk-PT-yOF" secondAttribute="trailing" constant="20" id="Krf-r9-32z"/>
+                            <constraint firstItem="L1R-cw-zaX" firstAttribute="top" secondItem="E2V-Z4-gwv" secondAttribute="bottom" constant="50" id="Zro-ls-Ecg"/>
                             <constraint firstItem="zQ3-Ia-lPL" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="131" id="e8z-hs-0NA"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="zQ3-Ia-lPL" secondAttribute="trailing" constant="38" id="hRV-r0-in3"/>
-                            <constraint firstItem="zQ3-Ia-lPL" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="50" id="yob-Fe-bcq"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="zQ3-Ia-lPL" secondAttribute="trailing" constant="20" id="hRV-r0-in3"/>
+                            <constraint firstItem="L1R-cw-zaX" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="x0B-zO-AyA"/>
+                            <constraint firstItem="cOJ-cB-8F9" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="yKx-5H-5Y3"/>
+                            <constraint firstItem="zQ3-Ia-lPL" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="yob-Fe-bcq"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="E73-kF-7VR"/>
                     <connections>
                         <outlet property="playView" destination="zQ3-Ia-lPL" id="NY1-Em-rTM"/>
+                        <outlet property="progressSlider" destination="Huk-PT-yOF" id="2Y9-uV-OGy"/>
+                        <outlet property="volumeSlider" destination="E2V-Z4-gwv" id="aqp-S2-2iM"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1499" y="150"/>
+            <point key="canvasLocation" x="1498.5507246376812" y="150"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="D7Z-AM-TkK">
@@ -88,6 +150,9 @@
     <resources>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemGray6Color">
+            <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

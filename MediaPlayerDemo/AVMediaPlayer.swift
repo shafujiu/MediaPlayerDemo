@@ -8,59 +8,6 @@
 import UIKit
 import AVFoundation
 
-class AVMediaPlayerLayerView: UIView, MediaPlayerViewProtocol {
-    private static var kReadyForDisplay = "ReadyForDisplay"
-    
-    var videoGravity: AVLayerVideoGravity {
-        set {
-            layer.videoGravity = newValue
-        }
-        get {
-            layer.videoGravity
-        }
-    }
-    
-    var readyForDisplay: Bool {
-        layer.isReadyForDisplay
-    }
-    
-    override var layer: AVPlayerLayer {
-        get {
-            super.layer as! AVPlayerLayer
-        }
-    }
-    
-    override class var layerClass: AnyClass {
-        AVPlayerLayer.self
-    }
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        commentInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commentInit()
-    }
-    
-    private func commentInit() {
-        self.layer.addObserver(self, forKeyPath: AVMediaPlayerLayerView.kReadyForDisplay, options: .new, context: &AVMediaPlayerLayerView.kReadyForDisplay)
-    }
-    
-    override class func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        
-        if context == &AVMediaPlayerLayerView.kReadyForDisplay {
-            DispatchQueue.main.async {
-                NotificationCenter.default.post(name: .SJMediaPlayerViewReadyForDisplayNotification, object: self)
-            }
-        }
-    }
-    
-    deinit {
-        self.layer.removeObserver(self, forKeyPath: AVMediaPlayerLayerView.kReadyForDisplay)
-    }
-}
 
 struct MediaSeekingInfo {
     var isSeeking: Bool
@@ -71,15 +18,23 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     
     private var _avPlayer: AVPlayer!
     private var _playView: AVMediaPlayerLayerView?
-    private var refreshTimer: Timer?
-    private var periodicTimeObserver: MediaPlayerTimeObserverItem?
+    
+    // 取进度回调
+    private var periodicTimeObserver: MediaPlayerPeriodicTimeObserverItem?
     private var minBufferedDuration: TimeInterval?
     private var innerError: Error?
     private var seekingInfo: MediaSeekingInfo = MediaSeekingInfo(isSeeking: false, time: .zero)
-//    private var playerItemStatusOb: NSKeyValueObservation?
     
+    private var playerItemStatusOb: NSKeyValueObservation?
+    private var playItemPlaybackLikelyToKeepUpOb: NSKeyValueObservation?
+    private var playItemPlaybackBufferEmptyOb: NSKeyValueObservation?
+    private var playItemPlaybackBufferFullOb: NSKeyValueObservation?
+    private var playItemLoadedTimeRangesOb: NSKeyValueObservation?
+    private var playItemPresentationSizeOb: NSKeyValueObservation?
+    private var avPlayerStatusOb: NSKeyValueObservation?
+    private var avPlayertimeControlStatusOb: NSKeyValueObservation?
     
-    weak var deleagte: MediaPlayerDelegate?
+    weak var delegate: MediaPlayerDelegate?
     
     var periodicTimeInterval: TimeInterval = 0.5 {
         didSet {
@@ -109,16 +64,17 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
         _playView
     }
     
-    private(set) var timeControlStatus: PlaybackTimeControlStatus {
+    private(set) var timeControlStatus: MediaTimeControlStatus {
         didSet {
-            self._refreshOrStop()
             self._postNotification(.SJMediaPlayerTimeControlStatusDidChangeNotification)
+            self.delegate?.mediaPlayer(self, timeControlStatusDidChange: timeControlStatus)
         }
     }
     
     var assetStatus: AssetStatus = .unknown {
         didSet {
             self._postNotification(.SJMediaPlayerAssetStatusDidChangeNotification)
+            self.delegate?.mediaPlayer(self, assetStatusDidChange: assetStatus)
         }
     }
     
@@ -130,6 +86,8 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
         didSet {
             if isPlaybackFinished {
                 self._postNotification(.SJMediaPlayerPlaybackDidFinishNotification)
+                self.delegate?.mediaPlayerPlaybackDidFinish(self)
+                
             }
         }
     }
@@ -153,45 +111,41 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     
     init(url: URL) {
         _avPlayer = AVPlayer(playerItem: AVPlayerItem(url: url))
-        _playView = AVMediaPlayerLayerView()
-        _playView?.layer.player = _avPlayer
         
         isPlaybackFinished = false
         timeControlStatus = .paused
         
         super.init()
-        
+        let layerView = AVMediaPlayerLayerView()
+        layerView.layer.player = _avPlayer
+        layerView.readyForDisplayHandler = { [weak self] in
+            guard let self = self else {return}
+            self.delegate?.mediaPlayerReadyForDisplay(self)
+        }
+        _playView = layerView
         _addPeriodicTimeObserver()
         _prepareToPlay()
     }
-    
     
     deinit {
         print("AVMediaPlayer deinit")
         _removePeriodicTimeObserver()
         
-        let playerItem = _avPlayer.currentItem
-        playerItem?.removeObserver(self, forKeyPath: kStatus, context: &kStatus)
-        playerItem?.removeObserver(self, forKeyPath: kPlaybackLikelyToKeepUp, context: &kPlaybackLikelyToKeepUp)
-        playerItem?.removeObserver(self, forKeyPath: kPlaybackBufferEmpty, context: &kPlaybackBufferEmpty)
-        playerItem?.removeObserver(self, forKeyPath: kPlaybackBufferFull, context: &kPlaybackBufferFull)
-        playerItem?.removeObserver(self, forKeyPath: kLoadedTimeRanges, context: &kLoadedTimeRanges)
-        playerItem?.removeObserver(self, forKeyPath: kPresentationSize, context: &kPresentationSize)
-        
-        _avPlayer.removeObserver(self, forKeyPath: kStatus, context: &kStatus)
-        if #available(iOS 10.0, *) {
-            _avPlayer.removeObserver(self, forKeyPath: kTimeControlStatus, context: &kTimeControlStatus)
-        }
-        
         NotificationCenter.default.removeObserver(self)
     }
     
-    func seekToTime(_ time: CMTime, completionHandler: CompletionHandler?) {
+    func seekToTime(_ time: TimeInterval, completionHandler: CompletionHandler?) {
         let tolerance = CMTime.positiveInfinity
-        seekToTime(time: time, toleranceBefore: tolerance, toleranceAfter: tolerance, completionHandler: completionHandler)
+        var targetTime = time
+        let dur = duration ?? 0
+        if time > dur {
+            targetTime = dur * 0.98
+        } else if time < 0 {
+            targetTime = 0
+        }
+        let seekTime = CMTime(seconds: targetTime, preferredTimescale: CMTimeScale(NSEC_PER_SEC))
+        seekToTime(time: seekTime, toleranceBefore: tolerance, toleranceAfter: tolerance, completionHandler: completionHandler)
     }
-    
-     
     
     var currentTime: TimeInterval {
         if isPlaybackFinished {
@@ -204,12 +158,16 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
     private(set) var duration: TimeInterval? {
         didSet {
             self._postNotification(.SJMediaPlayerDurationDidChangeNotification)
+            guard let dur = duration else {return}
+            self.delegate?.mediaPlayer(self, durationDidChange: dur)
         }
     }
     
     private(set) var playableDuration: TimeInterval? {
         didSet {
             self._postNotification(.SJMediaPlayerPlayableDurationDidChangeNotification)
+            guard let ableDur = playableDuration else {return}
+            self.delegate?.mediaPlayer(self, playableDurationDidChange: ableDur)
         }
     }
     
@@ -254,59 +212,9 @@ class AVMediaPlayer: NSObject, MediaPlayerProtocol {
         }
     }
     
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if #available(iOS 10, *) {
-            if context == &kTimeControlStatus  {
-                
-                switch _avPlayer.timeControlStatus {
-                case .paused:
-                    print("AVPlayer.TimeControlStatus.Paused\n");
-                case .waitingToPlayAtSpecifiedRate:
-                    if ( _avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.toMinimizeStalls ) {
-                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WaitingToMinimizeStallsReason)\n")
-                    }
-                    else if ( _avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.noItemToPlay ) {
-                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WaitingWithNoItemToPlayReason)\n")
-                    }
-                    else if ( _avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.evaluatingBufferingRate ) {
-                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WhileEvaluatingBufferingRateReason)\n")
-                    }
-                    
-                    print(error)
-                case .playing:
-                    print("AVPlayer.TimeControlStatus.Playing\n")
-                @unknown default:
-                    break
-                }
-            }
-        }
-        
-        if context == &kStatus ||
-        context == &kPlaybackLikelyToKeepUp ||
-        context == &kPlaybackBufferEmpty ||
-        context == &kPlaybackBufferFull ||
-        context == &kTimeControlStatus {
-            self._toEvaluating()
-        } else if context == &kLoadedTimeRanges {
-            _loadedTimeRangesDidChange()
-        } else if context == &kPresentationSize {
-            _presentationSizeDidChange()
-        }
-    }
 }
 
-
-
 // Mark: - private api
-
-fileprivate var kStatus = "status"
-fileprivate var kPlaybackLikelyToKeepUp = "playbackLikelyToKeepUp"
-fileprivate var kPlaybackBufferEmpty = "playbackBufferEmpty"
-fileprivate var kPlaybackBufferFull = "playbackBufferFull"
-fileprivate var kLoadedTimeRanges = "loadedTimeRanges"
-fileprivate var kPresentationSize = "presentationSize"
-fileprivate var kTimeControlStatus = "timeControlStatus"
-
 private extension AVMediaPlayer {
     
     func _removePeriodicTimeObserver() {
@@ -316,8 +224,10 @@ private extension AVMediaPlayer {
     
     /// 周期性 回调进度
     func _addPeriodicTimeObserver() {
-        periodicTimeObserver = MediaPlayerTimeObserverItem(interval: periodicTimeInterval, player: self, currentTimeDidChangeExeBlock: { time in
+        periodicTimeObserver = MediaPlayerPeriodicTimeObserverItem(interval: periodicTimeInterval, player: self, currentTimeDidChangeExeBlock: { [weak self] time in
             print("currentTimeDidChangeExeBlock time =", time)
+            guard let self = self else {return}
+            self.delegate?.mediaPlayer(self, currentTimeDidChange: time)
         }, playableDurationDidChangeExeBlock: { time in
             
         }, durationDidChangeExeBlock: { time in
@@ -337,34 +247,88 @@ private extension AVMediaPlayer {
             guard let self = self else {return}
             self._updateDuration()
         })
-//        playerItemStatusOb = playItem?.observe(\AVPlayerItem.status, options: [.new], changeHandler: { [weak self] _, change in
-//            change.newValue
-//
-//            self?._toEvaluating()
-//        })
         
+        addObservers(for: playItem)
         
-        
-        
-        // 监听playItem 状态
-        playItem?.addObserver(self, forKeyPath: kStatus, options: [.new], context: &kStatus)
-        playItem?.addObserver(self, forKeyPath: kPlaybackLikelyToKeepUp, options: [.new], context: &kPlaybackLikelyToKeepUp)
-        playItem?.addObserver(self, forKeyPath: kPlaybackBufferEmpty, options: [.new], context: &kPlaybackBufferEmpty)
-        playItem?.addObserver(self, forKeyPath: kPlaybackBufferFull, options: [.new], context: &kPlaybackBufferFull)
-        playItem?.addObserver(self, forKeyPath: kLoadedTimeRanges, options: [.new], context: &kLoadedTimeRanges)
-        playItem?.addObserver(self, forKeyPath: kPresentationSize, options: [.new], context: &kPresentationSize)
-        
-        //
-        _avPlayer.addObserver(self, forKeyPath: kStatus, options: [.new], context: &kStatus)
-        if #available(iOS 10.0, *) {
-            _avPlayer.addObserver(self, forKeyPath: kTimeControlStatus, options: [.new], context: &kTimeControlStatus)
-        }
+        addAVPlayerObserver()
         
         NotificationCenter.default.addObserver(self, selector: #selector(failedToPlayToEndTime(note:)), name: NSNotification.Name.AVPlayerItemFailedToPlayToEndTime, object: playItem)
         NotificationCenter.default.addObserver(self, selector: #selector(didPlayToEndTime(note:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playItem)
         NotificationCenter.default.addObserver(self, selector: #selector(newAccessLogEntry(note:)), name: NSNotification.Name.AVPlayerItemNewAccessLogEntry, object: playItem)
         
         self._toEvaluating()
+    }
+    
+    private func addAVPlayerObserver() {
+        avPlayerStatusOb = _avPlayer.observe(\.status, options: [.new], changeHandler: {[weak self] avp, change in
+            print("avPlayerStatusOb change new", avp.status.rawValue)
+            self?._toEvaluating()
+        })
+        if #available(iOS 10.0, *) {
+            avPlayertimeControlStatusOb = _avPlayer.observe(\AVPlayer.timeControlStatus, options: [.new], changeHandler: {[weak self] avp, change in
+                print("avPlayertimeControlStatusOb change new", avp.timeControlStatus.rawValue)
+                
+                self?._toEvaluating()
+                guard let self = self else {return}
+                switch self._avPlayer.timeControlStatus {
+                case .paused:
+                    print("AVPlayer.TimeControlStatus.Paused\n");
+                case .waitingToPlayAtSpecifiedRate:
+                    if ( self._avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.toMinimizeStalls ) {
+                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WaitingToMinimizeStallsReason)\n")
+                    }
+                    else if ( self._avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.noItemToPlay ) {
+                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WaitingWithNoItemToPlayReason)\n")
+                    }
+                    else if ( self._avPlayer.reasonForWaitingToPlay == AVPlayer.WaitingReason.evaluatingBufferingRate ) {
+                        print("AVPlayer.TimeControlStatus.WaitingToPlay(Reason: WhileEvaluatingBufferingRateReason)\n")
+                    }
+                    
+                    print(self.error)
+                case .playing:
+                    print("AVPlayer.TimeControlStatus.Playing\n")
+                @unknown default:
+                    break
+                }
+            })
+        }
+    }
+    
+    private func addObservers(for item: AVPlayerItem?) {
+        
+        /// 资源状态
+        playerItemStatusOb = item?.observe(\.status, options: [.new], changeHandler: { [weak self] _, change in
+            print("playerItemStatusOb change new ", change.newValue ?? "")
+            self?._toEvaluating()
+        })
+        /// 缓存是否足够播放
+        playItemPlaybackLikelyToKeepUpOb = item?.observe(\.isPlaybackLikelyToKeepUp, options: [.new], changeHandler: { [weak self] _, change in
+            print("playItemPlaybackLikelyToKeepUpOb change new", change.newValue ?? "")
+            self?._toEvaluating()
+        })
+        
+        playItemPlaybackBufferEmptyOb = item?.observe(\.isPlaybackBufferEmpty, options: [.new], changeHandler: { [weak self] _, change in
+            print("playItemPlaybackBufferEmptyOb change new", change.newValue ?? "")
+            self?._toEvaluating()
+        })
+        
+        playItemPlaybackBufferFullOb = item?.observe(\.isPlaybackBufferFull, options: [.new], changeHandler: { [weak self] _, change in
+            print("playItemPlaybackBufferFullOb change new", change.newValue ?? "")
+            self?._toEvaluating()
+        })
+        
+        playItemLoadedTimeRangesOb = item?.observe(\.loadedTimeRanges, options: [.new], changeHandler: { [weak self] _, change in
+//            print("playItemLoadedTimeRangesOb change new", change.newValue ?? "")
+            self?._loadedTimeRangesDidChange()
+        })
+        
+        playItemPresentationSizeOb = item?.observe(\.presentationSize, options: [.new], changeHandler: { [weak self] _, change in
+            print("playItemPresentationSizeOb change new", change.newValue ?? "")
+            guard let self = self, let size = change.newValue else {return}
+            self._postNotification(.SJMediaPlayerPresentationSizeDidChangeNotification)
+            self.delegate?.mediaPlayer(self, presentationSizeDidChange: size)
+        })
+        
     }
     
     @objc private func failedToPlayToEndTime(note: Notification) {
@@ -375,7 +339,10 @@ private extension AVMediaPlayer {
     }
     
     @objc private func didPlayToEndTime(note: Notification) {
-        _didPlayToEndTime(note)
+        DispatchQueue.main.async {
+            self.isPlaybackFinished = true
+            self.pause()
+        }
     }
     
     @objc private func newAccessLogEntry(note: Notification) {
@@ -439,10 +406,6 @@ private extension AVMediaPlayer {
         }
     }
     
-    func _refreshOrStop() {
-      
-    }
-    
     func _willSeeking(_ time: CMTime) {
         _avPlayer.currentItem?.cancelPendingSeeks()
         seekingInfo.time = time
@@ -455,20 +418,8 @@ private extension AVMediaPlayer {
         seekingInfo.isSeeking = false
     }
     
-    func _didPlayToEndTime(_ note: Notification) {
-        DispatchQueue.main.async {
-//            self.finishedReason = SJFinishedReasonToEndTimePosition;
-            self.isPlaybackFinished = true
-            self.pause()
-        }
-    }
-    
     func _updatePlaybackType(note: Notification) {
         
-    }
-    
-    func _presentationSizeDidChange() {
-        self._postNotification(.SJMediaPlayerPresentationSizeDidChangeNotification)
     }
     
     func _loadedTimeRangesDidChange() {
@@ -505,7 +456,6 @@ private extension AVMediaPlayer {
         self._toEvaluating()
     }
     
-    
     func seekToTime(time: CMTime, toleranceBefore: CMTime, toleranceAfter: CMTime, completionHandler: CompletionHandler?) {
         if _avPlayer.currentItem?.status != .readyToPlay {
             completionHandler?(false)
@@ -518,94 +468,12 @@ private extension AVMediaPlayer {
             self?._didEndSeeking()
             completionHandler?(finished)
         })
-    
     }
 }
-
-class MediaPlayerTimeObserverItem {
-    typealias TimeChangedBlock = (_ time: TimeInterval)->()
-    
-    private var interval: TimeInterval
-    private weak var player: MediaPlayerProtocol?
-    private var currentTimeDidChangeExeBlock: TimeChangedBlock?
-    private var playableDurationDidChangeExeBlock: TimeChangedBlock?
-    private var durationDidChangeExeBlock: TimeChangedBlock?
-    
-    private var timer: Timer?
-    private var currentTime: TimeInterval?
-    
-    init(interval: TimeInterval, player: MediaPlayerProtocol, currentTimeDidChangeExeBlock: TimeChangedBlock?,
-         playableDurationDidChangeExeBlock: TimeChangedBlock?,
-         durationDidChangeExeBlock:TimeChangedBlock?) {
-        self.interval = interval
-        self.player = player
-        
-        self.currentTimeDidChangeExeBlock = currentTimeDidChangeExeBlock
-        self.playableDurationDidChangeExeBlock = playableDurationDidChangeExeBlock
-        self.durationDidChangeExeBlock = durationDidChangeExeBlock
-        
-        self.resumeOrPause()
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(resumeOrPause), name: .SJMediaPlayerTimeControlStatusDidChangeNotification, object: player)
-        NotificationCenter.default.addObserver(self, selector: #selector(durationDidChange), name: .SJMediaPlayerDurationDidChangeNotification, object: player)
-        NotificationCenter.default.addObserver(self, selector: #selector(playableDurationDidChange), name: .SJMediaPlayerPlayableDurationDidChangeNotification, object: player)
-    }
-    
-    
-    deinit {
-        timer?.invalidate()
-        NotificationCenter.default.removeObserver(self)
-    }
-    
-    func invalidate() {
-        timer?.invalidate()
-        timer = nil
-    }
-    
-    @objc private func durationDidChange() {
-        guard let durantion = player?.duration else {return}
-        durationDidChangeExeBlock?(durantion)
-    }
-    
-    @objc private func playableDurationDidChange() {
-        guard let playableDuration = player?.playableDuration else {return}
-        playableDurationDidChangeExeBlock?(playableDuration)
-    }
-    
-    @objc private func resumeOrPause() {
-        if player?.timeControlStatus == .paused {
-            self.invalidate()
-        } else if (timer == nil) {
-            timer = Timer(timeInterval: interval, target: self, selector: #selector(timeAction(_:)), userInfo: nil, repeats: true)
-            timer?.fireDate = Date(timeIntervalSinceNow: interval)
-            RunLoop.main.add(timer!, forMode: .common)
-        }
-    }
-    
-    @objc private func timeAction(_ timer: Timer) {
-        _refresh()
-    }
-    
-    func stop() {
-        self.invalidate()
-        playableDurationDidChangeExeBlock?(0)
-        currentTimeDidChangeExeBlock?(0)
-        durationDidChangeExeBlock?(0)
-    }
-    
-    private func _refresh() {
-        guard let currentTime = player?.currentTime else { return }
-        if self.currentTime != currentTime {
-            self.currentTime = currentTime
-            currentTimeDidChangeExeBlock?(currentTime)
-        }
-    }
-}
-
 
 @available(iOS 10.0, *)
 extension AVPlayer.TimeControlStatus {
-    var playbackTimeControlStatus: PlaybackTimeControlStatus {
+    var playbackTimeControlStatus: MediaTimeControlStatus {
         switch self {
         case .paused:
             return .paused

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		818F36F7269EC276006CC5AD /* AVMediaPlayerLayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F36F6269EC276006CC5AD /* AVMediaPlayerLayerView.swift */; };
+		818F36F9269EDC2F006CC5AD /* MediaPlayerPeriodicTimeObserverItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818F36F8269EDC2F006CC5AD /* MediaPlayerPeriodicTimeObserverItem.swift */; };
 		818FB889269C1E2E00FA5B84 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB888269C1E2E00FA5B84 /* AppDelegate.swift */; };
 		818FB88D269C1E2E00FA5B84 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 818FB88C269C1E2E00FA5B84 /* ViewController.swift */; };
 		818FB890269C1E2E00FA5B84 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 818FB88E269C1E2E00FA5B84 /* Main.storyboard */; };
@@ -17,6 +19,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		818F36F6269EC276006CC5AD /* AVMediaPlayerLayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVMediaPlayerLayerView.swift; sourceTree = "<group>"; };
+		818F36F8269EDC2F006CC5AD /* MediaPlayerPeriodicTimeObserverItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediaPlayerPeriodicTimeObserverItem.swift; sourceTree = "<group>"; };
 		818FB885269C1E2E00FA5B84 /* MediaPlayerDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MediaPlayerDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		818FB888269C1E2E00FA5B84 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		818FB88C269C1E2E00FA5B84 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +70,8 @@
 				818FB896269C1E2F00FA5B84 /* Info.plist */,
 				818FB89C269C1FBC00FA5B84 /* MediaPlayerProtocol.swift */,
 				818FB89E269C4F6300FA5B84 /* AVMediaPlayer.swift */,
+				818F36F6269EC276006CC5AD /* AVMediaPlayerLayerView.swift */,
+				818F36F8269EDC2F006CC5AD /* MediaPlayerPeriodicTimeObserverItem.swift */,
 			);
 			path = MediaPlayerDemo;
 			sourceTree = "<group>";
@@ -140,10 +146,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				818F36F9269EDC2F006CC5AD /* MediaPlayerPeriodicTimeObserverItem.swift in Sources */,
 				818FB88D269C1E2E00FA5B84 /* ViewController.swift in Sources */,
 				818FB889269C1E2E00FA5B84 /* AppDelegate.swift in Sources */,
 				818FB89F269C4F6300FA5B84 /* AVMediaPlayer.swift in Sources */,
 				818FB89D269C1FBC00FA5B84 /* MediaPlayerProtocol.swift in Sources */,
+				818F36F7269EC276006CC5AD /* AVMediaPlayerLayerView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
